@@ -33,7 +33,7 @@ public class DiscordClient {
 
     public DiscordClient(Configuration config) {
         this.config = config;
-        this.events = new DiscordEvents(this);
+        this.events = new DiscordEvents();
         this.thread = new DiscordThread(this, this.events, this.config);
     }
 
