@@ -1,6 +1,9 @@
 package com.aeonlucid.discordsync.bot;
 
+import com.aeonlucid.discordsync.config.Configuration;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -9,11 +12,22 @@ import net.minecraft.server.management.PlayerList;
 import net.minecraft.util.Util;
 import net.minecraft.util.text.*;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 public class DiscordEvents extends ListenerAdapter {
 
+    private static final Logger LOGGER = LogManager.getLogger();
+
+    private final Configuration config;
+
     private boolean isReady;
+
+    public DiscordEvents(Configuration config) {
+
+        this.config = config;
+    }
 
     public boolean isReady() {
         return isReady;
@@ -22,6 +36,20 @@ public class DiscordEvents extends ListenerAdapter {
     @Override
     public void onReady(@NotNull ReadyEvent event) {
         isReady = true;
+
+        // Load members of target guild.
+        final JDA jda = event.getJDA();
+        final TextChannel channel = jda.getTextChannelById(config.botChannel);
+
+        if (channel != null) {
+            channel.getGuild().loadMembers().onSuccess(members -> {
+                LOGGER.debug("Loaded {} guild members into cache", members.size());
+            }).onError(throwable -> {
+                LOGGER.error("Failed to load guild members", throwable);
+            });
+        } else {
+            LOGGER.error("Failed to load guild members, text channel {} was not found", config.botChannel);
+        }
     }
 
     @Override

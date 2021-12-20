@@ -9,9 +9,13 @@ import com.aeonlucid.discordsync.utils.MessageUtils;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.managers.Presence;
+import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.Compression;
+import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import net.minecraft.util.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -33,7 +37,7 @@ public class DiscordClient {
 
     public DiscordClient(Configuration config) {
         this.config = config;
-        this.events = new DiscordEvents();
+        this.events = new DiscordEvents(this.config);
         this.thread = new DiscordThread(this, this.events, this.config);
     }
 
@@ -57,6 +61,9 @@ public class DiscordClient {
         builder.addEventListeners(events);
         builder.setEnableShutdownHook(false);
         builder.setAutoReconnect(true);
+        builder.enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_MESSAGES);
+        builder.setMemberCachePolicy(MemberCachePolicy.ALL);
+        builder.setChunkingFilter(ChunkingFilter.ALL);
 
         try {
             bot = builder.build();
@@ -128,7 +135,7 @@ public class DiscordClient {
             return;
         }
 
-        channel.sendMessage(MessageUtils.sanitizeMentions(message)).submit();
+        channel.sendMessage(MessageUtils.replaceMentions(message, channel)).submit();
     }
 
     /**
@@ -142,9 +149,15 @@ public class DiscordClient {
             return;
         }
 
+        TextChannel channel = null;
+
+        if (bot != null && events.isReady()) {
+            channel = bot.getTextChannelById(config.botChannel);
+        }
+
         WebhookMessageBuilder builder = new WebhookMessageBuilder();
 
-        builder.setContent(MessageUtils.sanitizeMentions(message));
+        builder.setContent(MessageUtils.replaceMentions(message, channel));
         builder.setUsername(displayName);
         builder.setAvatarUrl(avatarUrl);
 
