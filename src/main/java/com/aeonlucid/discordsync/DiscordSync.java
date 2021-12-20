@@ -12,6 +12,10 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.text.IFormattableTextComponent;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
@@ -88,9 +92,15 @@ public class DiscordSync {
     @SubscribeEvent
     public void playerChat(final ServerChatEvent e) {
         if (discordClient != null) {
-            discordClient.sendPlayerMessage(MarkdownSanitizer.sanitize(e.getMessage()),
+            String replacement = discordClient.sendPlayerMessage(MarkdownSanitizer.sanitize(e.getMessage()),
                     PlayerUtils.getName(e.getPlayer()),
                     PlayerUtils.getAvatar(e.getPlayer()));
+
+            if (replacement != null && e.getComponent() instanceof TranslationTextComponent) {
+                final TranslationTextComponent component = (TranslationTextComponent)e.getComponent();
+
+                component.getArgs()[1] = new StringTextComponent(replacement);
+            }
         }
     }
 

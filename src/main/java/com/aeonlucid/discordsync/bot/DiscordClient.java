@@ -9,7 +9,6 @@ import com.aeonlucid.discordsync.utils.MessageUtils;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.managers.Presence;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -135,7 +134,7 @@ public class DiscordClient {
             return;
         }
 
-        channel.sendMessage(MessageUtils.replaceMentions(message, channel)).submit();
+        channel.sendMessage(MessageUtils.replaceMentions(message, channel, false).getDiscordMessage()).submit();
     }
 
     /**
@@ -143,10 +142,11 @@ public class DiscordClient {
      * @param message The message to write
      * @param displayName Minecraft display name of the sender
      * @param avatarUrl Avatar URL of the sender
+     * @return A replacement message for the chat, null if no replacement.
      */
-    public void sendPlayerMessage(String message, String displayName, String avatarUrl) {
+    public String sendPlayerMessage(String message, String displayName, String avatarUrl) {
         if (webhook == null || shuttingDown) {
-            return;
+            return null;
         }
 
         TextChannel channel = null;
@@ -155,13 +155,16 @@ public class DiscordClient {
             channel = bot.getTextChannelById(config.botChannel);
         }
 
-        WebhookMessageBuilder builder = new WebhookMessageBuilder();
+        final WebhookMessageBuilder builder = new WebhookMessageBuilder();
+        final MessageUtils.Result result = MessageUtils.replaceMentions(message, channel, true);
 
-        builder.setContent(MessageUtils.replaceMentions(message, channel));
+        builder.setContent(result.getDiscordMessage());
         builder.setUsername(displayName);
         builder.setAvatarUrl(avatarUrl);
 
         webhook.send(builder.build());
+
+        return result.getMinecraftMessage();
     }
 
     public void updatePresence(String message) {

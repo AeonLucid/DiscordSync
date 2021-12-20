@@ -11,19 +11,33 @@ public class MessageUtils {
 
     private static final Pattern MentionPattern = Pattern.compile("@[a-zA-Z0-9 ]{1,32}");
 
-    public static String replaceMentions(String message, TextChannel channel) {
+    /**
+     * Replace discord mentions in a minecraft chat message with proper discord mentions.
+     * @param message The message in which to replace.
+     * @param channel The channel
+     * @param userMentions
+     * @return
+     */
+    public static Result replaceMentions(String message, TextChannel channel, boolean userMentions) {
         // Replace dangerous mentions.
-        final String messageMinecraft = message
+        String messageDiscord = message
                 .replace("@here", "[here]")
                 .replace("@everyone", "[everyone]");
 
+        // Check if we should do user mentions at all.
+        if (!userMentions) {
+            return new Result(messageDiscord, null);
+        }
+
         // Check if a channel is set and there are any @ signs left.
-        if (channel == null || !messageMinecraft.contains("@")) {
-            return message;
+        if (channel == null || !messageDiscord.contains("@")) {
+            return new Result(messageDiscord, null);
         }
 
         final List<Member> members = channel.getMembers();
         final Matcher matcher = MentionPattern.matcher(message);
+
+        String messageMinecraft = messageDiscord;
 
         while (matcher.find()) {
             Member result = null;
@@ -72,11 +86,41 @@ public class MessageUtils {
 
             // Check if result is found.
             if (result != null) {
-                message = message.replace("@" + target, result.getAsMention());
+                final String replacement = "@" + target;
+
+                messageDiscord = messageDiscord.replace(replacement, result.getAsMention());
+                messageMinecraft = messageMinecraft.replace(replacement, "\247e" + replacement + "\247r");
             }
         }
 
-        return message;
+        return new Result(messageDiscord, messageMinecraft);
+    }
+
+    public static class Result {
+
+        private final String discordMessage;
+        private final String minecraftMessage;
+
+        public Result(String discordMessage, String minecraftMessage) {
+            this.discordMessage = discordMessage;
+            this.minecraftMessage = minecraftMessage;
+        }
+
+        /**
+         * The modified message meant for Discord.
+         */
+        public String getDiscordMessage() {
+            return discordMessage;
+        }
+
+        /**
+         * The modified message meant for Minecraft.
+         * @return null if no replacement.
+         */
+        public String getMinecraftMessage() {
+            return minecraftMessage;
+        }
+
     }
 
 }
