@@ -44,6 +44,6 @@ jobs:
 
       - uses: actions/upload-artifact@v2
         with:
-          name: Artifacts
+          name: DiscordSync 1.16.5
           path: ./build/libs/discordsync-*.jar
           retention-days: 14

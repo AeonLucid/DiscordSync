@@ -1,4 +1,4 @@
-# DiscordSync
+# DiscordSync [![GitHub Workflow Status](https://img.shields.io/github/workflow/status/AeonLucid/DiscordSync/DiscordSync%20Build)](https://github.com/AeonLucid/DiscordSync/actions)
 
 Small mod for Minecraft Forge **1.16.5** that sends messages of in-game events to a channel in your Discord server. 
 This mod also enables cross-chatting between Minecraft and Discord.
