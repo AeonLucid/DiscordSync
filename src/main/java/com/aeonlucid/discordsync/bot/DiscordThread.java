@@ -1,5 +1,9 @@
 package com.aeonlucid.discordsync.bot;
 
+import com.aeonlucid.discordsync.config.Configuration;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.management.PlayerList;
+import net.minecraftforge.fml.server.ServerLifecycleHooks;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -11,14 +15,16 @@ public class DiscordThread extends Thread {
 
     private final DiscordClient client;
     private final DiscordEvents events;
+    private final Configuration config;
 
     private final ConcurrentLinkedQueue<String> serverMessages;
 
-    private boolean isActive;
+    private boolean keepRunning;
 
-    public DiscordThread(DiscordClient client, DiscordEvents events) {
+    public DiscordThread(DiscordClient client, DiscordEvents events, Configuration config) {
         this.client = client;
         this.events = events;
+        this.config = config;
         this.serverMessages = new ConcurrentLinkedQueue<>();
 
         setName("DiscordSync thread");
@@ -27,9 +33,14 @@ public class DiscordThread extends Thread {
 
     @Override
     public void run() {
-        while (isActive) {
-            // Send queued server messages when bot is ready.
-            sendQueuedServerMessages();
+        while (keepRunning) {
+            try {
+                sendQueuedServerMessages();
+
+                updatePresence();
+            } catch (Exception e) {
+                LOGGER.error("Exception caught in DiscordThread", e);
+            }
 
             // Sleep.
             try {
@@ -40,12 +51,8 @@ public class DiscordThread extends Thread {
         }
     }
 
-    public boolean isActive() {
-        return isActive;
-    }
-
-    public void setActive(boolean active) {
-        isActive = active;
+    public void setKeepRunning(boolean keepRunning) {
+        this.keepRunning = keepRunning;
     }
 
     /**
@@ -64,6 +71,29 @@ public class DiscordThread extends Thread {
                 client.sendServerMessage(serverMessages.remove());
             }
         }
+    }
+
+    /**
+     * Update presence with current online players.
+     */
+    private void updatePresence() {
+        final MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+
+        if (server == null) {
+            return;
+        }
+
+        final PlayerList playerList = server.getPlayerList();
+
+        final int current = playerList.getPlayerCount();
+        final int max = playerList.getMaxPlayers();
+
+        final String message = config.botStatus
+                .replace("%online%", String.valueOf(current))
+                .replace("%max%", String.valueOf(max))
+                .replace("%plural%", current != 1 ? "s" : "");
+
+        client.updatePresence(message);
     }
 
 }

@@ -5,11 +5,12 @@ import club.minnced.discord.webhook.external.JDAWebhookClient;
 import club.minnced.discord.webhook.send.AllowedMentions;
 import club.minnced.discord.webhook.send.WebhookMessageBuilder;
 import com.aeonlucid.discordsync.config.Configuration;
+import com.aeonlucid.discordsync.utils.MessageUtils;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.managers.Presence;
 import net.dv8tion.jda.api.utils.Compression;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import net.minecraft.util.StringUtils;
@@ -18,7 +19,7 @@ import org.apache.logging.log4j.Logger;
 
 import javax.security.auth.login.LoginException;
 
-public class DiscordClient extends ListenerAdapter {
+public class DiscordClient {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -33,7 +34,7 @@ public class DiscordClient extends ListenerAdapter {
     public DiscordClient(Configuration config) {
         this.config = config;
         this.events = new DiscordEvents(this);
-        this.thread = new DiscordThread(this, this.events);
+        this.thread = new DiscordThread(this, this.events, this.config);
     }
 
     public void initialize() {
@@ -52,7 +53,7 @@ public class DiscordClient extends ListenerAdapter {
         builder.disableCache(CacheFlag.ACTIVITY);
         builder.setBulkDeleteSplittingEnabled(false);
         builder.setCompression(Compression.ZLIB);
-        builder.setActivity(Activity.playing("Test"));
+        builder.setActivity(Activity.playing("Server starting"));
         builder.addEventListeners(events);
         builder.setEnableShutdownHook(false);
         builder.setAutoReconnect(true);
@@ -60,7 +61,7 @@ public class DiscordClient extends ListenerAdapter {
         try {
             bot = builder.build();
 
-            thread.setActive(true);
+            thread.setKeepRunning(true);
             thread.start();
         } catch (LoginException e) {
             LOGGER.error("Failed to authenticate with discord using the provider bot token", e);
@@ -86,12 +87,14 @@ public class DiscordClient extends ListenerAdapter {
         shuttingDown = true;
 
         if (bot != null) {
+            thread.setKeepRunning(false);
+
+            updatePresence("Server stopping");
+
             try {
                 bot.shutdownNow();
             } catch (Exception e) {
                 LOGGER.error("Exception caught while stopping discord bot", e);
-            } finally {
-                thread.setActive(false);
             }
         }
 
@@ -125,7 +128,7 @@ public class DiscordClient extends ListenerAdapter {
             return;
         }
 
-        channel.sendMessage(message).submit();
+        channel.sendMessage(MessageUtils.sanitizeMentions(message)).submit();
     }
 
     /**
@@ -141,10 +144,27 @@ public class DiscordClient extends ListenerAdapter {
 
         WebhookMessageBuilder builder = new WebhookMessageBuilder();
 
-        builder.setContent(message);
+        builder.setContent(MessageUtils.sanitizeMentions(message));
         builder.setUsername(displayName);
         builder.setAvatarUrl(avatarUrl);
 
         webhook.send(builder.build());
     }
+
+    public void updatePresence(String message) {
+        if (bot == null || shuttingDown) {
+            return;
+        }
+
+        final Presence presence = bot.getPresence();
+        final Activity activity = presence.getActivity();
+
+        // Only update if presence changed.
+        if (activity == null || message.equals(activity.getName())) {
+            return;
+        }
+
+        presence.setPresence(Activity.playing(message), false);
+    }
+
 }
