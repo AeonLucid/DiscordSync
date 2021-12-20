@@ -11,12 +11,16 @@ public class MessageUtils {
 
     private static final Pattern MentionPattern = Pattern.compile("@[a-zA-Z0-9 ]{1,32}");
 
+    private static final String ColorYellow = "\247e";
+    private static final String ColorLightPurple = "\247d";
+    private static final String ColorDarkPurple = "\2475";
+    private static final String ColorReset = "\247r";
+
     /**
      * Replace discord mentions in a minecraft chat message with proper discord mentions.
      * @param message The message in which to replace.
      * @param channel The channel
-     * @param userMentions
-     * @return
+     * @param userMentions Whether user mentions should be replaced
      */
     public static Result replaceMentions(String message, TextChannel channel, boolean userMentions) {
         // Replace dangerous mentions.
@@ -89,7 +93,7 @@ public class MessageUtils {
                 final String replacement = "@" + target;
 
                 messageDiscord = messageDiscord.replace(replacement, result.getAsMention());
-                messageMinecraft = messageMinecraft.replace(replacement, "\247e" + replacement + "\247r");
+                messageMinecraft = messageMinecraft.replace(replacement, ColorYellow + replacement + ColorReset);
             }
         }
 
