@@ -23,8 +23,11 @@ jobs:
           distribution: 'adopt'
           cache: gradle
 
-      - name: Verify gradle
+      - name: Gradle verify
         uses: gradle/wrapper-validation-action@v1
+
+      - name: Gradle fix executable
+        run: chmod +x ./gradlew
 
       - name: Build
         run: ./gradlew :build
