@@ -8,8 +8,11 @@ buildscript {
     }
 }
 
+plugins {
+    id 'com.github.johnrengelman.shadow' version '7.1.1'
+}
+
 apply plugin: 'net.minecraftforge.gradle'
-apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
 version = '1.0.0'
@@ -37,18 +40,6 @@ minecraft {
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
-
-dependencies {
-    minecraft 'net.minecraftforge:forge:1.16.5-36.2.22'
-
-    implementation 'com.google.code.gson:gson:2.8.9'
-
-    implementation("net.dv8tion:JDA:5.0.0-alpha.2") {
-        exclude module: 'opus-java'
-    }
-
-    implementation("club.minnced:discord-webhooks:0.7.4")
-}
 
 jar {
     manifest {
@@ -79,4 +70,68 @@ publishing {
             url "file:///${project.projectDir}/mcmodsrepo"
         }
     }
+}
+
+// Shadow
+configurations {
+    embed
+    compileOnly.extendsFrom(embed)
+}
+
+shadowJar {
+    configurations = [project.configurations.embed]
+
+    // https://imperceptiblethoughts.com/shadow/configuration/relocation/#filtering-relocation
+    def packageShadow = 'com.aeonlucid.discordsync.shadow'
+    def packages = [
+            'club.minnced',
+            'com.fasterxml',
+            'com.google.gson',
+            'gnu.trove',
+            'javax.annotation',
+            'net.dv8tion',
+            'okhttp3',
+            'okio',
+            'org.apache',
+            'org.intellij',
+            'org.jetbrains',
+            'org.jetbrains',
+            'org.json',
+            'org.json',
+            'org.slf4j',
+            'com.iwebpp',
+            'com.iwebpp',
+            'com.neovisionaries',
+    ]
+
+    for (p in packages) {
+        relocate p, packageShadow + "." + p
+    }
+
+    // https://imperceptiblethoughts.com/shadow/configuration/minimizing/
+    minimize()
+}
+
+reobf {
+    shadowJar {
+        dependsOn tasks.createMcpToSrg
+        mappings = tasks.createMcpToSrg.outputs.files.singleFile
+    }
+}
+
+artifacts {
+    archives tasks.shadowJar
+}
+
+tasks.build.dependsOn(tasks.shadowJar)
+
+// Dependencies
+dependencies {
+    minecraft 'net.minecraftforge:forge:1.16.5-36.2.22'
+
+    embed('net.dv8tion:JDA:5.0.0-alpha.2') {
+        exclude module: 'opus-java'
+    }
+
+    embed 'club.minnced:discord-webhooks:0.7.4'
 }
