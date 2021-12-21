@@ -72,14 +72,25 @@ publishing {
     }
 }
 
-// Shadow
 configurations {
-    embed
-    compileOnly.extendsFrom(embed)
+    shade
+    compileOnly.extendsFrom shade
+}
+
+dependencies {
+    minecraft 'net.minecraftforge:forge:1.16.5-36.2.22'
+
+    shade('net.dv8tion:JDA:5.0.0-alpha.2') {
+        exclude(module: 'opus-java')
+    }
+
+    shade 'club.minnced:discord-webhooks:0.7.4'
+    shade 'org.slf4j:slf4j-simple:1.7.32'
 }
 
 shadowJar {
-    configurations = [project.configurations.embed]
+    archiveFileName = "discordsync-${project.version}-forge.jar"
+    configurations = [project.configurations.shade]
 
     // https://imperceptiblethoughts.com/shadow/configuration/relocation/#filtering-relocation
     def packageShadow = 'com.aeonlucid.discordsync.shadow'
@@ -108,27 +119,14 @@ shadowJar {
     minimize()
 }
 
+artifacts {
+    archives shadowJar
+    shadow shadowJar
+}
+
 reobf {
     shadowJar {
-        dependsOn tasks.createMcpToSrg
-        mappings = tasks.createMcpToSrg.outputs.files.singleFile
+        dependsOn createMcpToSrg
+        mappings = createMcpToSrg.outputs.files.singleFile
     }
-}
-
-artifacts {
-    archives tasks.shadowJar
-}
-
-tasks.build.dependsOn(tasks.shadowJar)
-
-// Dependencies
-dependencies {
-    minecraft 'net.minecraftforge:forge:1.16.5-36.2.22'
-
-    embed('net.dv8tion:JDA:5.0.0-alpha.2') {
-        exclude module: 'opus-java'
-    }
-
-    embed 'club.minnced:discord-webhooks:0.7.4'
-    embed 'org.slf4j:slf4j-simple:1.7.32'
 }
