@@ -41,6 +41,22 @@ minecraft {
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
+configurations {
+    shade
+    implementation.extendsFrom shade
+}
+
+dependencies {
+    minecraft 'net.minecraftforge:forge:1.16.5-36.2.22'
+
+    shade('net.dv8tion:JDA:5.0.0-alpha.2') {
+        exclude(module: 'opus-java')
+    }
+
+    shade 'club.minnced:discord-webhooks:0.7.4'
+    shade 'org.slf4j:slf4j-simple:1.7.32'
+}
+
 jar {
     manifest {
         attributes([
@@ -58,35 +74,6 @@ jar {
 }
 
 jar.finalizedBy('reobfJar')
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            artifact jar
-        }
-    }
-    repositories {
-        maven {
-            url "file:///${project.projectDir}/mcmodsrepo"
-        }
-    }
-}
-
-configurations {
-    shade
-    implementation.extendsFrom shade
-}
-
-dependencies {
-    minecraft 'net.minecraftforge:forge:1.16.5-36.2.22'
-
-    shade('net.dv8tion:JDA:5.0.0-alpha.2') {
-        exclude(module: 'opus-java')
-    }
-
-    shade 'club.minnced:discord-webhooks:0.7.4'
-    shade 'org.slf4j:slf4j-simple:1.7.32'
-}
 
 shadowJar {
     archiveFileName = "discordsync-${project.version}-forge.jar"
@@ -124,9 +111,15 @@ artifacts {
     shadow shadowJar
 }
 
-reobf {
-    shadowJar {
-        dependsOn createMcpToSrg
-        mappings = createMcpToSrg.outputs.files.singleFile
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifact jar
+        }
+    }
+    repositories {
+        maven {
+            url "file:///${project.projectDir}/mcmodsrepo"
+        }
     }
 }
