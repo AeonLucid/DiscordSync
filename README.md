@@ -18,6 +18,7 @@ This mod also enables cross-chatting between Minecraft and Discord.
 
 - Send messages from Minecraft to Discord
 - Send messages from Discord to Minecraft
+- Mention Discord users by their username or nickname within Minecraft
 
 ### Presence
 

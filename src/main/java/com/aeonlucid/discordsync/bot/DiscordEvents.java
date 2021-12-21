@@ -106,8 +106,5 @@ public class DiscordEvents extends ListenerAdapter {
 
         // Send to all players.
         playerList.broadcastMessage(textComponent, ChatType.SYSTEM, Util.NIL_UUID);
-
-        // Send to server console.
-        server.sendMessage(textComponent, Util.NIL_UUID);
     }
 }

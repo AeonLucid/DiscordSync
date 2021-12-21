@@ -86,22 +86,18 @@ shadowJar {
     def packages = [
             'club.minnced',
             'com.fasterxml',
-            'com.google.gson',
+            'com.iwebpp',
+            'com.neovisionaries',
             'gnu.trove',
             'javax.annotation',
             'net.dv8tion',
             'okhttp3',
             'okio',
-            'org.apache',
-            'org.intellij',
-            'org.jetbrains',
-            'org.jetbrains',
-            'org.json',
+            'org.apache.commons.collections4',
+            'org.intellij.lang',
+            'org.jetbrains.annotations',
             'org.json',
             'org.slf4j',
-            'com.iwebpp',
-            'com.iwebpp',
-            'com.neovisionaries',
     ]
 
     for (p in packages) {
@@ -134,4 +130,5 @@ dependencies {
     }
 
     embed 'club.minnced:discord-webhooks:0.7.4'
+    embed 'org.slf4j:slf4j-simple:1.7.32'
 }
