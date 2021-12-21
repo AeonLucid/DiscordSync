@@ -21,6 +21,7 @@ import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.AdvancementEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -89,7 +90,9 @@ public class DiscordSync {
         }
     }
 
-    @SubscribeEvent
+    // High priority because other mods are potentially replacing the TranslationTextComponent
+    // with another type of component.
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void playerChat(final ServerChatEvent e) {
         if (discordClient != null) {
             String replacement = discordClient.sendPlayerMessage(MarkdownSanitizer.sanitize(e.getMessage()),
