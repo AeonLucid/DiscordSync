@@ -24,6 +24,11 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(8)
 minecraft {
     mappings channel: 'official', version: '1.16.5'
     runs {
+        all {
+            lazyToken('minecraft_classpath') {
+                configurations.shade.copyRecursive().resolve().collect { it.absolutePath }.join(File.pathSeparator)
+            }
+        }
         server {
             workingDirectory project.file('run')
 
@@ -74,7 +79,7 @@ publishing {
 
 configurations {
     shade
-    compileOnly.extendsFrom shade
+    implementation.extendsFrom shade
 }
 
 dependencies {
