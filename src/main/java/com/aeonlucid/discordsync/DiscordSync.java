@@ -70,7 +70,7 @@ public class DiscordSync {
     }
 
     @SubscribeEvent
-    public void onServerStopping(FMLServerStoppedEvent event) {
+    public void onServerStopped(FMLServerStoppedEvent event) {
         if (discordClient != null) {
             discordClient.shutdown();
         }

@@ -99,7 +99,7 @@ public class DiscordClient {
 
             try {
                 bot.shutdownNow();
-            } catch (Exception e) {
+            } catch (Exception | NoClassDefFoundError e) {
                 LOGGER.error("Exception caught while stopping discord bot", e);
             }
         }
