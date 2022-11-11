@@ -105,7 +105,11 @@ shadowJar {
             'org.json',
             'org.slf4j',
             'kotlin',
+            'tomp2p',
+            'com.sun'
     ]
+
+    exclude('META-INF/services/**')
 
     for (p in packages) {
         relocate p, packageShadow + "." + p
