@@ -6,17 +6,17 @@ import club.minnced.discord.webhook.send.AllowedMentions;
 import club.minnced.discord.webhook.send.WebhookMessageBuilder;
 import com.aeonlucid.discordsync.config.Configuration;
 import com.aeonlucid.discordsync.utils.MessageUtils;
+import com.aeonlucid.discordsync.utils.StringUtils;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.managers.Presence;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.Compression;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
-import net.minecraft.util.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -69,7 +69,7 @@ public class DiscordClient {
 
             thread.setKeepRunning(true);
             thread.start();
-        } catch (LoginException e) {
+        } catch (Exception e) {
             LOGGER.error("Failed to authenticate with discord using the provider bot token", e);
         }
     }

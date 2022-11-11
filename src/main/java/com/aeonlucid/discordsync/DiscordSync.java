@@ -7,27 +7,24 @@ import com.aeonlucid.discordsync.utils.PlayerUtils;
 import net.dv8tion.jda.api.utils.MarkdownSanitizer;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.DisplayInfo;
-import net.minecraft.advancements.PlayerAdvancements;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.text.IFormattableTextComponent;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.server.PlayerAdvancements;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.AdvancementEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.server.ServerStoppedEvent;
+import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLDedicatedServerSetupEvent;
-import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
-import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 @Mod("discordsync")
@@ -63,14 +60,14 @@ public class DiscordSync {
     }
 
     @SubscribeEvent
-    public void onServerStopping(FMLServerStoppingEvent event) {
+    public void onServerStopping(ServerStoppingEvent event) {
         if (discordClient != null) {
             discordClient.sendServerMessage("**Server stopping**");
         }
     }
 
     @SubscribeEvent
-    public void onServerStopped(FMLServerStoppedEvent event) {
+    public void onServerStopped(ServerStoppedEvent event) {
         if (discordClient != null) {
             discordClient.shutdown();
         }
@@ -99,10 +96,12 @@ public class DiscordSync {
                     PlayerUtils.getName(e.getPlayer()),
                     PlayerUtils.getAvatar(e.getPlayer()));
 
-            if (replacement != null && e.getComponent() instanceof TranslationTextComponent) {
-                final TranslationTextComponent component = (TranslationTextComponent)e.getComponent();
-
-                component.getArgs()[1] = new StringTextComponent(replacement);
+            if (replacement != null && e.getComponent() instanceof TextComponent) {
+                //e.setComponent(new TextComponent(replacement));
+                //final TranslationTextComponent component = (TranslationTextComponent)e.getComponent();
+                //
+                //component.getArgs()[1] = new TextComponent(replacement);
+                // TODO: Debug.
             }
         }
     }
@@ -111,7 +110,7 @@ public class DiscordSync {
     public void playerDeath(final LivingDeathEvent e) {
         final Entity entity = e.getEntity();
 
-        if (!(entity instanceof PlayerEntity)) {
+        if (!(entity instanceof Player)) {
             return;
         }
 
@@ -130,7 +129,7 @@ public class DiscordSync {
             return;
         }
 
-        final PlayerAdvancements advancements = server.getPlayerList().getPlayerAdvancements((ServerPlayerEntity) e.getPlayer());
+        final PlayerAdvancements advancements = server.getPlayerList().getPlayerAdvancements((ServerPlayer) e.getPlayer());
         final Advancement advancement = e.getAdvancement();
 
         if (!advancements.getOrStartProgress(advancement).isDone()) {

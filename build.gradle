@@ -9,7 +9,7 @@ buildscript {
 }
 
 plugins {
-    id 'com.github.johnrengelman.shadow' version '7.1.1'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
 
 apply plugin: 'net.minecraftforge.gradle'
@@ -19,10 +19,12 @@ version = '1.0.0'
 group = 'com.aeonlucid.discordsync'
 archivesBaseName = 'discordsync'
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(8)
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+
+println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 
 minecraft {
-    mappings channel: 'official', version: '1.16.5'
+    mappings channel: 'official', version: '1.18.2'
     runs {
         server {
             workingDirectory project.file('run')
@@ -47,14 +49,14 @@ configurations {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.16.5-36.2.22'
+    minecraft 'net.minecraftforge:forge:1.18.2-40.1.48'
 
-    shade('net.dv8tion:JDA:5.0.0-alpha.2') {
+    shade('net.dv8tion:JDA:5.0.0-alpha.22') {
         exclude(module: 'opus-java')
     }
 
-    shade 'club.minnced:discord-webhooks:0.7.4'
-    shade 'org.slf4j:slf4j-simple:1.7.32'
+    shade 'club.minnced:discord-webhooks:0.8.2'
+    shade 'org.slf4j:slf4j-simple:2.0.3'
 }
 
 jar {
@@ -122,4 +124,8 @@ publishing {
             url "file:///${project.projectDir}/mcmodsrepo"
         }
     }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
 }

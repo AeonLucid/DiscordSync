@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion="[36,)"
+loaderVersion="[40,)"
 license="All rights reserved"
 
 [[mods]]
@@ -18,12 +18,12 @@ Cross chatting between Minecraft and a Discord channel.
 [[dependencies.discordsync]]
     modId="forge"
     mandatory=true
-    versionRange="[36,)"
+    versionRange="[40.1.0,)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.discordsync]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.16.5,1.17)"
+    versionRange="[1.18.2]"
     ordering="NONE"
     side="SERVER"

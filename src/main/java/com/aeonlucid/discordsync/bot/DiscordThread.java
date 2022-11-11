@@ -2,8 +2,8 @@ package com.aeonlucid.discordsync.bot;
 
 import com.aeonlucid.discordsync.config.Configuration;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.management.PlayerList;
-import net.minecraftforge.fml.server.ServerLifecycleHooks;
+import net.minecraft.server.players.PlayerList;
+import net.minecraftforge.server.ServerLifecycleHooks;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
