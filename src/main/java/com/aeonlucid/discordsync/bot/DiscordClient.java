@@ -20,8 +20,6 @@ import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.security.auth.login.LoginException;
-
 public class DiscordClient {
 
     private static final Logger LOGGER = LogManager.getLogger();
@@ -60,7 +58,7 @@ public class DiscordClient {
         builder.addEventListeners(events);
         builder.setEnableShutdownHook(false);
         builder.setAutoReconnect(true);
-        builder.enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_MESSAGES);
+        builder.enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_MESSAGES, GatewayIntent.MESSAGE_CONTENT);
         builder.setMemberCachePolicy(MemberCachePolicy.ALL);
         builder.setChunkingFilter(ChunkingFilter.ALL);
 

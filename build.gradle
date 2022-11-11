@@ -15,7 +15,7 @@ plugins {
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'maven-publish'
 
-version = '1.0.0'
+version = '1.1.0'
 group = 'com.aeonlucid.discordsync'
 archivesBaseName = 'discordsync'
 
@@ -41,6 +41,15 @@ minecraft {
     }
 }
 
+// Configure all runs with the following
+minecraft.runs.all {
+    // Set the minecraft_classpath token to the paths of all jars in the library configuration
+    // This is added with the actual Minecraft classpath to get the real classpath information later on
+    lazyToken('minecraft_classpath') {
+        configurations.shade.copyRecursive().resolve().collect { it.absolutePath }.join(File.pathSeparator)
+    }
+}
+
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 configurations {
@@ -51,10 +60,7 @@ configurations {
 dependencies {
     minecraft 'net.minecraftforge:forge:1.18.2-40.1.48'
 
-    shade('net.dv8tion:JDA:5.0.0-alpha.22') {
-        exclude(module: 'opus-java')
-    }
-
+    shade 'net.dv8tion:JDA:5.0.0-alpha.22'
     shade 'club.minnced:discord-webhooks:0.8.2'
     shade 'org.slf4j:slf4j-simple:2.0.3'
 }
@@ -98,6 +104,7 @@ shadowJar {
             'org.jetbrains.annotations',
             'org.json',
             'org.slf4j',
+            'kotlin',
     ]
 
     for (p in packages) {

@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.utils.MarkdownSanitizer;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.DisplayInfo;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerAdvancements;
 import net.minecraft.server.level.ServerPlayer;
@@ -96,12 +97,8 @@ public class DiscordSync {
                     PlayerUtils.getName(e.getPlayer()),
                     PlayerUtils.getAvatar(e.getPlayer()));
 
-            if (replacement != null && e.getComponent() instanceof TextComponent) {
-                //e.setComponent(new TextComponent(replacement));
-                //final TranslationTextComponent component = (TranslationTextComponent)e.getComponent();
-                //
-                //component.getArgs()[1] = new TextComponent(replacement);
-                // TODO: Debug.
+            if (replacement != null && e.getComponent() instanceof final TranslatableComponent component) {
+                component.getArgs()[1] = new TextComponent(replacement);
             }
         }
     }
