@@ -58,7 +58,7 @@ configurations {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.18.2-40.1.48'
+    minecraft 'net.minecraftforge:forge:1.18.2-40.1.84'
 
     shade 'net.dv8tion:JDA:5.0.0-alpha.22'
     shade 'club.minnced:discord-webhooks:0.8.2'
