@@ -16,8 +16,7 @@ public class PlayerUtils {
     }
 
     public static String getAvatar(ServerPlayer player) {
-        //return String.format("https://crafatar.com/avatars/%s?overlay=true&size=100", player.getUUID());
-        return String.format("https://minotar.net/avatar/%s/100.png", player.getUUID().toString().replace("-", ""));
+        return String.format("https://crafatar.com/avatars/%s?overlay=true&size=100", player.getUUID());
     }
 
 }
