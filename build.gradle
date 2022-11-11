@@ -81,8 +81,6 @@ jar {
     }
 }
 
-jar.finalizedBy('reobfJar')
-
 shadowJar {
     archiveFileName = "discordsync-${project.version}-forge.jar"
     configurations = [project.configurations.shade]
@@ -117,6 +115,12 @@ shadowJar {
 
     // https://imperceptiblethoughts.com/shadow/configuration/minimizing/
     minimize()
+
+    finalizedBy 'reobfShadowJar'
+}
+
+reobf {
+    shadowJar {}
 }
 
 artifacts {
