@@ -25,6 +25,10 @@ This mod also enables cross-chatting between Minecraft and Discord.
 - Show current players in Discord bot presence
 - Show max players in Discord bot presence
 
+## Development notes
+
+If you get gradle errors, try running `gradlew --stop` first.
+
 ## Download
 
 TODO

@@ -35,6 +35,6 @@ jobs:
 
       - uses: actions/upload-artifact@v3
         with:
-          name: DiscordSync 1.18.2
+          name: DiscordSync 1.20.1
           path: ./build/libs/discordsync-*-forge.jar
           retention-days: 14

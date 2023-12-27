@@ -1,6 +1,6 @@
 buildscript {
     repositories {
-        maven { url = 'https://maven.minecraftforge.net' }
+        maven { url = 'https://files.minecraftforge.net/maven' }
         mavenCentral()
     }
     dependencies {
@@ -15,7 +15,7 @@ plugins {
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'maven-publish'
 
-version = '1.1.0'
+version = '1.2.0'
 group = 'com.aeonlucid.discordsync'
 archivesBaseName = 'discordsync'
 
@@ -24,7 +24,7 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 
 minecraft {
-    mappings channel: 'official', version: '1.18.2'
+    mappings channel: 'official', version: '1.20.1'
     runs {
         server {
             workingDirectory project.file('run')
@@ -58,10 +58,10 @@ configurations {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.18.2-40.1.84'
+    minecraft 'net.minecraftforge:forge:1.20.1-47.2.16'
 
-    shade 'net.dv8tion:JDA:5.0.0-alpha.22'
-    shade 'club.minnced:discord-webhooks:0.8.2'
+    shade 'net.dv8tion:JDA:5.0.0-beta.18'
+    shade 'club.minnced:discord-webhooks:0.8.4'
     shade 'org.slf4j:slf4j-simple:2.0.3'
 }
 
