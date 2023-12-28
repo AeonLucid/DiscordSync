@@ -7,8 +7,8 @@ import com.aeonlucid.discordsync.utils.PlayerUtils;
 import net.dv8tion.jda.api.utils.MarkdownSanitizer;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.DisplayInfo;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.PlayerAdvancements;
 import net.minecraft.server.level.ServerPlayer;
@@ -77,14 +77,14 @@ public class DiscordSync {
     @SubscribeEvent
     public void playerJoin(final PlayerEvent.PlayerLoggedInEvent e) {
         if (discordClient != null) {
-            discordClient.sendServerMessage(String.format("**%s joined the server**", PlayerUtils.getName(e.getPlayer())));
+            discordClient.sendServerMessage(String.format("**%s joined the server**", PlayerUtils.getName(e.getEntity())));
         }
     }
 
     @SubscribeEvent
     public void playerLeft(final PlayerEvent.PlayerLoggedOutEvent e) {
         if (discordClient != null) {
-            discordClient.sendServerMessage(String.format("**%s left the server**", PlayerUtils.getName(e.getPlayer())));
+            discordClient.sendServerMessage(String.format("**%s left the server**", PlayerUtils.getName(e.getEntity())));
         }
     }
 
@@ -93,12 +93,12 @@ public class DiscordSync {
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void playerChat(final ServerChatEvent e) {
         if (discordClient != null) {
-            String replacement = discordClient.sendPlayerMessage(MarkdownSanitizer.sanitize(e.getMessage()),
+            String replacement = discordClient.sendPlayerMessage(MarkdownSanitizer.sanitize(e.getMessage().getString()),
                     PlayerUtils.getName(e.getPlayer()),
                     PlayerUtils.getAvatar(e.getPlayer()));
 
-            if (replacement != null && e.getComponent() instanceof final TranslatableComponent component) {
-                component.getArgs()[1] = new TextComponent(replacement);
+            if (replacement != null && e.getMessage().getContents() instanceof final TranslatableContents component) {
+                component.getArgs()[1] = Component.literal(replacement);
             }
         }
     }
@@ -111,7 +111,7 @@ public class DiscordSync {
             return;
         }
 
-        final String deathMessage = e.getSource().getLocalizedDeathMessage(e.getEntityLiving()).getString();
+        final String deathMessage = e.getSource().getLocalizedDeathMessage(e.getEntity()).getString();
 
         if (discordClient != null) {
             discordClient.sendServerMessage(String.format("**%s**", MarkdownSanitizer.sanitize(deathMessage)));
@@ -120,13 +120,13 @@ public class DiscordSync {
 
     @SubscribeEvent
     public void playerAdvancement(final AdvancementEvent e) {
-        final MinecraftServer server = e.getPlayer().getServer();
+        final MinecraftServer server = e.getEntity().getServer();
 
         if (server == null) {
             return;
         }
 
-        final PlayerAdvancements advancements = server.getPlayerList().getPlayerAdvancements((ServerPlayer) e.getPlayer());
+        final PlayerAdvancements advancements = server.getPlayerList().getPlayerAdvancements((ServerPlayer) e.getEntity());
         final Advancement advancement = e.getAdvancement();
 
         if (!advancements.getOrStartProgress(advancement).isDone()) {
@@ -141,7 +141,7 @@ public class DiscordSync {
 
         if (discordClient != null) {
             discordClient.sendServerMessage(String.format("%s has made the advancement **[%s]**",
-                    PlayerUtils.getName(e.getPlayer()),
+                    PlayerUtils.getName(e.getEntity()),
                     MarkdownSanitizer.sanitize(titleDisplay.getTitle().getString())));
         }
     }

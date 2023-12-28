@@ -5,13 +5,14 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.events.session.*;
+import net.dv8tion.jda.api.events.session.ReadyEvent;
+import net.dv8tion.jda.api.events.session.SessionDisconnectEvent;
+import net.dv8tion.jda.api.events.session.SessionRecreateEvent;
+import net.dv8tion.jda.api.events.session.SessionResumeEvent;
+import net.dv8tion.jda.api.events.session.ShutdownEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
-import net.minecraft.network.chat.ChatType;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.players.PlayerList;
 import net.minecraftforge.server.ServerLifecycleHooks;
@@ -101,13 +102,13 @@ public class DiscordEvents extends ListenerAdapter {
         final String sender = member.getEffectiveName();
         final String message = event.getMessage().getContentStripped();
 
-        final Component textComponent = new TextComponent("")
-                        .append(new TextComponent("[Discord @").withStyle(ChatFormatting.AQUA))
-                        .append(new TextComponent(sender).withStyle(ChatFormatting.GREEN))
-                        .append(new TextComponent("] ").withStyle(ChatFormatting.AQUA))
+        final Component textComponent = Component.literal("")
+                        .append(Component.literal("[Discord @").withStyle(ChatFormatting.AQUA))
+                        .append(Component.literal(sender).withStyle(ChatFormatting.GREEN))
+                        .append(Component.literal("] ").withStyle(ChatFormatting.AQUA))
                         .append(message);
 
         // Send to all players.
-        playerList.broadcastMessage(textComponent, ChatType.SYSTEM, Util.NIL_UUID);
+        playerList.broadcastSystemMessage(textComponent, true);
     }
 }

@@ -6,10 +6,10 @@ import net.minecraft.world.entity.player.Player;
 public class PlayerUtils {
 
     public static String getName(Player player) {
-        String name = player.getDisplayName().getContents();
+        String name = player.getDisplayName().getString();
 
         if (name.isEmpty()) {
-            name = player.getName().getContents();
+            name = player.getName().getString();
         }
 
         return name;
