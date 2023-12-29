@@ -46,7 +46,11 @@ minecraft.runs.all {
     // Set the minecraft_classpath token to the paths of all jars in the library configuration
     // This is added with the actual Minecraft classpath to get the real classpath information later on
     lazyToken('minecraft_classpath') {
-        configurations.shade.copyRecursive().resolve().collect { it.absolutePath }.join(File.pathSeparator)
+        configurations.shade.copyRecursive().resolve()
+                .collect { it.absolutePath }
+                .findAll { !it.contains("org.jetbrains\\annotations\\13.0") }
+                .findAll { !it.contains("org.jetbrains\\annotations\\23.0") }
+                .join(File.pathSeparator)
     }
 }
 
