@@ -93,7 +93,7 @@ public class DiscordSync {
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void playerChat(final ServerChatEvent e) {
         if (discordClient != null) {
-            String replacement = discordClient.sendPlayerMessage(MarkdownSanitizer.sanitize(e.getMessage().getString()),
+            String replacement = discordClient.sendPlayerMessage(MarkdownSanitizer.sanitize(e.getRawText()),
                     PlayerUtils.getName(e.getPlayer()),
                     PlayerUtils.getAvatar(e.getPlayer()));
 
@@ -119,7 +119,7 @@ public class DiscordSync {
     }
 
     @SubscribeEvent
-    public void playerAdvancement(final AdvancementEvent e) {
+    public void playerAdvancement(final AdvancementEvent.AdvancementEarnEvent e) {
         final MinecraftServer server = e.getEntity().getServer();
 
         if (server == null) {

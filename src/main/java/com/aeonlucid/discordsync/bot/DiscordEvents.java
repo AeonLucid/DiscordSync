@@ -109,6 +109,6 @@ public class DiscordEvents extends ListenerAdapter {
                         .append(message);
 
         // Send to all players.
-        playerList.broadcastSystemMessage(textComponent, true);
+        playerList.broadcastSystemMessage(textComponent, false);
     }
 }
